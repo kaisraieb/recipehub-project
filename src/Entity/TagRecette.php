@@ -6,6 +6,8 @@ use App\Repository\TagRecetteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: TagRecetteRepository::class)]
 class TagRecette
@@ -16,9 +18,20 @@ class TagRecette
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le nom du tag est obligatoire")]
+    #[Assert\Length(
+        max: 50,
+        maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères"
+    )]
+    #[UniqueEntity('nom', message: "Ce tag existe déjà")]
     private ?string $nom = null;
 
     #[ORM\Column(length: 7)]
+    #[Assert\NotBlank(message: "La couleur est obligatoire")]
+    #[Assert\Regex(
+        pattern: '/^#[0-9A-Fa-f]{6}$/',
+        message: "La couleur doit être un code hex valide (ex: #FF5733)"
+    )]
     private ?string $couleur = null;
 
     /**
