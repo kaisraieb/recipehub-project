@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: RecetteRepository::class)]
@@ -18,24 +19,53 @@ class Recette
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre est obligatoire")]
+    #[Assert\Length(
+        min: 5,
+        minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
+        max: 255
+    )]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[Assert\Length(
+        min: 30,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères"
+    )]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "Les instructions sont obligatoires")]
     private ?string $instructions = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "Le temps de préparation est requis")]
+    #[Assert\Range(
+        min: 1,
+        notInRangeMessage: "Le temps de préparation doit être supérieur à {{ min }}"
+    )]
     private ?int $tempsPreparation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Positive(message: "Le temps de cuisson doit être positif")]
     private ?int $tempsCuisson = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: "La difficulté est obligatoire")]
+    #[Assert\Choice(
+        choices: ['facile', 'moyen', 'difficile'],
+        message: "Choisissez une difficulté valide"
+    )]
     private ?string $difficulte = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "Le nombre de personnes est requis")]
+    #[Assert\Range(
+        min: 1,
+        max: 50,
+        notInRangeMessage: "Le nombre de personnes doit être entre {{ min }} et {{ max }}"
+    )]
     private ?int $nbPersonnes = null;
 
     #[ORM\Column]
@@ -45,6 +75,10 @@ class Recette
     private ?bool $publiee = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le nom de l'image ne doit pas dépasser {{ limit }} caractères"
+    )]
     private ?string $imageName = null;
 
     #[ORM\ManyToOne(inversedBy: 'recettes')]
